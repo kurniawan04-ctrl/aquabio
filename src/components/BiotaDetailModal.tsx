@@ -59,7 +59,7 @@ export default function BiotaDetailModal({ fish, isOpen, onClose }: BiotaDetailM
               className="fixed inset-4 z-[9999] overflow-y-auto sm:inset-8 md:inset-12 lg:inset-16"
             >
               <div className="flex min-h-full items-center justify-center p-4">
-                <div className="relative w-full max-w-4xl overflow-hidden rounded-2xl border-2 border-white/30 bg-white/90 shadow-2xl backdrop-blur-xl">
+                <div className="relative w-full max-w-5xl overflow-hidden rounded-2xl border-2 border-white/30 bg-white/90 shadow-2xl backdrop-blur-xl">
                   {/* Close Button */}
                   <button
                     onClick={onClose}
@@ -68,123 +68,126 @@ export default function BiotaDetailModal({ fish, isOpen, onClose }: BiotaDetailM
                     <X className="h-5 w-5" />
                   </button>
 
-                  {/* Fish Image */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="relative aspect-video overflow-hidden cursor-pointer group"
-                    onClick={() => setIsImageModalOpen(true)}
-                  >
-                    <img
-                      src={fish.image}
-                      alt={fish.name}
-                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    />
-                    
-                    {/* Image Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    
-                    {/* Click to View Full Size Indicator */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="rounded-full bg-white/20 backdrop-blur-md px-4 py-2 text-white text-sm font-medium">
-                        Klik untuk melihat ukuran penuh
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Content Section */}
-                  <div className="p-5 sm:p-6 md:p-8">
-                    {/* Title */}
+                  {/* Layout: Desktop = Grid 2 kolom, Mobile = Stack vertikal */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2">
+                    {/* Fish Image - Lebih kecil dan proporsional */}
                     <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.3 }}
-                      className="mb-4 md:mb-6"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      className="relative h-64 sm:h-80 lg:h-full lg:min-h-[500px] overflow-hidden cursor-pointer group"
+                      onClick={() => setIsImageModalOpen(true)}
                     >
-                      <h2 className="font-['Montserrat',sans-serif] font-bold text-cyan-900 text-2xl md:text-3xl lg:text-4xl">
-                        {fish.name.toUpperCase()}
-                      </h2>
+                      <img
+                        src={fish.image}
+                        alt={fish.name}
+                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                      />
+                      
+                      {/* Image Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      
+                      {/* Click to View Full Size Indicator */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="rounded-full bg-white/20 backdrop-blur-md px-4 py-2 text-white text-sm font-medium">
+                          Klik untuk melihat ukuran penuh
+                        </div>
+                      </div>
                     </motion.div>
 
-                    {/* Description */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.4 }}
-                      className="mb-5 md:mb-6"
-                    >
-                      <div className="mb-2 flex items-center gap-2">
-                        <Fish className="h-5 w-5 text-cyan-600 md:h-6 md:w-6" />
-                        <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-base md:text-lg">
-                          Deskripsi
-                        </h3>
-                      </div>
-                      <p className="text-gray-700 text-sm md:text-base leading-relaxed">
-                        {fish.description || `${fish.name} adalah ikan air tawar asli Indonesia yang berasal dari perairan ${fish.location}.`}
-                      </p>
-                    </motion.div>
+                    {/* Content Section - Langsung terlihat tanpa scroll */}
+                    <div className="p-5 sm:p-6 md:p-8 overflow-y-auto max-h-[500px] lg:max-h-none">
+                      {/* Title */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="mb-4"
+                      >
+                        <h2 className="font-['Montserrat',sans-serif] font-bold text-cyan-900 text-xl md:text-2xl lg:text-3xl">
+                          {fish.name.toUpperCase()}
+                        </h2>
+                      </motion.div>
 
-                    {/* Details Grid */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.5 }}
-                      className="mb-6 md:mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-4"
-                    >
-                      {/* Category */}
-                      <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 p-4 border border-cyan-200">
-                        <div className="mb-2 flex items-center gap-2">
-                          <ImageIcon className="h-4 w-4 text-cyan-600 md:h-5 md:w-5" />
-                          <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-xs md:text-sm">
-                            Kategori
-                          </h3>
-                        </div>
-                        <div className="inline-flex items-center rounded-md bg-cyan-100 px-3 py-1">
-                          <span className="text-xs md:text-sm font-medium text-cyan-900">{fish.category || "Ikan Air Tawar"}</span>
-                        </div>
-                      </div>
-
-                      {/* Location */}
-                      <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 p-4 border border-cyan-200">
-                        <div className="mb-2 flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-cyan-600 md:h-5 md:w-5" />
-                          <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-xs md:text-sm">
-                            Lokasi
-                          </h3>
-                        </div>
-                        <p className="text-xs md:text-sm font-medium text-gray-700">
-                          {fish.location}
-                        </p>
-                      </div>
-
-                      {/* Date */}
-                      <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 p-4 border border-cyan-200">
-                        <div className="mb-2 flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-cyan-600 md:h-5 md:w-5" />
-                          <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-xs md:text-sm">
-                            Tanggal
-                          </h3>
-                        </div>
-                        <p className="text-xs md:text-sm font-medium text-gray-700">{formatDate(fish.uploadDate)}</p>
-                      </div>
-
-                      {/* Photographer */}
-                      <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 p-4 border border-cyan-200">
-                        <div className="mb-2 flex items-center gap-2">
-                          <Camera className="h-4 w-4 text-cyan-600 md:h-5 md:w-5" />
-                          <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-xs md:text-sm">
-                            Fotografer
-                          </h3>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 md:h-7 md:w-7">
-                            <User className="h-3 w-3 text-white md:h-4 md:w-4" />
+                      {/* Details Grid - Compact, langsung terlihat */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="mb-4 grid grid-cols-2 gap-3 sm:gap-4"
+                      >
+                        {/* Category */}
+                        <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 p-3 border border-cyan-200">
+                          <div className="mb-1.5 flex items-center gap-1.5">
+                            <ImageIcon className="h-4 w-4 text-cyan-600 flex-shrink-0" />
+                            <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-xs">
+                              Kategori
+                            </h3>
                           </div>
-                          <span className="text-xs md:text-sm font-medium text-gray-700">{fish.photographer || "Tabola Bale"}</span>
+                          <div className="inline-flex items-center rounded-md bg-cyan-100 px-2 py-1">
+                            <span className="text-xs font-medium text-cyan-900">{fish.category || "Ikan Air Tawar"}</span>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
+
+                        {/* Location */}
+                        <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 p-3 border border-cyan-200">
+                          <div className="mb-1.5 flex items-center gap-1.5">
+                            <MapPin className="h-4 w-4 text-cyan-600 flex-shrink-0" />
+                            <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-xs">
+                              Lokasi
+                            </h3>
+                          </div>
+                          <p className="text-xs font-medium text-gray-700 line-clamp-2">
+                            {fish.location}
+                          </p>
+                        </div>
+
+                        {/* Date */}
+                        <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 p-3 border border-cyan-200">
+                          <div className="mb-1.5 flex items-center gap-1.5">
+                            <Calendar className="h-4 w-4 text-cyan-600 flex-shrink-0" />
+                            <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-xs">
+                              Tanggal
+                            </h3>
+                          </div>
+                          <p className="text-xs font-medium text-gray-700">{formatDate(fish.uploadDate)}</p>
+                        </div>
+
+                        {/* Photographer */}
+                        <div className="rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 p-3 border border-cyan-200">
+                          <div className="mb-1.5 flex items-center gap-1.5">
+                            <Camera className="h-4 w-4 text-cyan-600 flex-shrink-0" />
+                            <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-xs">
+                              Fotografer
+                            </h3>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex-shrink-0">
+                              <User className="h-3 w-3 text-white" />
+                            </div>
+                            <span className="text-xs font-medium text-gray-700 line-clamp-1">{fish.photographer || "Tabola Bale"}</span>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Description - Langsung terlihat setelah details */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                        className="mt-4"
+                      >
+                        <div className="mb-2 flex items-center gap-2">
+                          <Fish className="h-5 w-5 text-cyan-600 flex-shrink-0" />
+                          <h3 className="font-['Montserrat',sans-serif] font-semibold text-cyan-900 text-base">
+                            Deskripsi
+                          </h3>
+                        </div>
+                        <p className="text-gray-700 text-sm leading-relaxed">
+                          {fish.description || `${fish.name} adalah ikan air tawar asli Indonesia yang berasal dari perairan ${fish.location}.`}
+                        </p>
+                      </motion.div>
+                    </div>
                   </div>
                 </div>
               </div>

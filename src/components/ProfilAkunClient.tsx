@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { deleteBiota } from '@/actions/biota'
 import ProfilAkun from './ProfilAkun'
 
@@ -52,10 +53,19 @@ export default function ProfilAkunClient({ fishDatabase, user, isAdmin }: Profil
     if (confirm('Apakah Anda yakin ingin menghapus foto ini?')) {
       try {
         await deleteBiota(fishId.toString())
+        // ✅ NOTIFIKASI SUKSES: Muncul setelah berhasil menghapus biota
+        toast.success('Data biota Anda berhasil dihapus.', {
+          description: 'Foto biota telah dihapus dari database.',
+          duration: 3000,
+        })
         router.refresh()
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting biota:', error)
-        alert('Gagal menghapus foto')
+        // ❌ NOTIFIKASI ERROR: Muncul jika gagal menghapus biota
+        toast.error('Gagal menghapus data biota', {
+          description: error.message || 'Terjadi kesalahan saat menghapus data biota. Silakan coba lagi.',
+          duration: 4000,
+        })
       }
     }
   }
