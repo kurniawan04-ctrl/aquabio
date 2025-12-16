@@ -4,6 +4,8 @@ import { getBiota } from '@/actions/biota'
 import HasilPencarianClient from '@/components/HasilPencarianClient'
 import PencarianTidakDitemukanClient from '@/components/PencarianTidakDitemukanClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function PencarianPage({
   searchParams,
 }: {

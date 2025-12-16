@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import RegisterPageClient from '@/components/RegisterPageClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function RegisterPage() {
   try {
     const supabase = await createClient()

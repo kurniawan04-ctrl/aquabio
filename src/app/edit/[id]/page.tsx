@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { getBiotaById } from '@/actions/biota'
 import EditFotoBiotaClient from '@/components/EditFotoBiotaClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function EditPage({
   params,
 }: {

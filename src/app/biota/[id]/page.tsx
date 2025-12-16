@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { getBiotaById } from '@/actions/biota'
 import DetailBiotaClient from '@/components/DetailBiotaClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DetailBiotaPage({
   params,
 }: {

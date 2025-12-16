@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { getBiota } from '@/actions/biota'
 import AdminBerandaClient from '@/components/AdminBerandaClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

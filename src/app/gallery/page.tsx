@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { getBiota } from '@/actions/biota'
 import GalleryClient from '@/components/GalleryClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function GalleryPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
