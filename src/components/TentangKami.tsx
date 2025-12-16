@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from "motion/react";
+import Image from "next/image";
 import Logo from "./Logo";
 import { ArrowLeft, Home, Info, GraduationCap, MapPin } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
@@ -206,23 +207,14 @@ export default function TentangKami({ onBack, onBackHome, onNavigate }: TentangK
               {/* Avatar Circle - Foto jika tersedia, kalau tidak pakai inisial */}
               <div className="relative mb-4 flex justify-center">
                 {member.photoUrl ? (
-                  <div className="relative">
-                    <img
+                  <div className="relative h-24 w-24">
+                    <Image
                       src={member.photoUrl}
                       alt={member.name}
-                      className="h-24 w-24 rounded-full object-cover shadow-lg ring-4 ring-white/30 transition-all group-hover:ring-white/50"
-                      onError={(e) => {
-                        // Fallback ke inisial jika foto tidak ditemukan
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent && !parent.querySelector('.fallback-initial')) {
-                          const fallback = document.createElement('div');
-                          fallback.className = 'fallback-initial flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg ring-4 ring-white/30 transition-all group-hover:ring-white/50';
-                          fallback.innerHTML = `<span class="font-['Montserrat',sans-serif] font-bold text-white text-3xl">${member.name.charAt(0)}</span>`;
-                          parent.appendChild(fallback);
-                        }
-                      }}
+                      width={96}
+                      height={96}
+                      className="rounded-full object-cover shadow-lg ring-4 ring-white/30 transition-all group-hover:ring-white/50"
+                      unoptimized
                     />
                   </div>
                 ) : (

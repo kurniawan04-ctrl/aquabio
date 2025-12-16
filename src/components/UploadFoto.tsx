@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion } from "motion/react";
 import Logo from "./Logo";
 import { Button } from "./ui/button";
@@ -254,18 +255,20 @@ export default function UploadFoto({ onBack, onBackHome, onUpload, onNavigateToA
                     </label>
                   </div>
                 ) : (
-                  <div className="relative">
-                    <img
+                  <div className="relative w-full h-96">
+                    <Image
                       src={previewUrl}
                       alt="Preview"
-                      className="w-full rounded-lg object-cover max-h-96"
+                      fill
+                      className="rounded-lg object-cover"
+                      unoptimized
                     />
                     <button
                       onClick={() => {
                         setSelectedFile(null);
                         setPreviewUrl("");
                       }}
-                      className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white shadow-lg transition-all hover:bg-red-600 hover:scale-110"
+                      className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white shadow-lg transition-all hover:bg-red-600 hover:scale-110 z-10"
                     >
                       <X className="h-5 w-5" />
                     </button>

@@ -28,7 +28,7 @@ interface ProfilAkunProps {
   onEditFish?: (fish: any) => void;
   onDeleteFish?: (fishId: number | string) => void;
   onNavigateToAbout?: () => void;
-  user?: { username?: string; email?: string; id?: string };
+  user?: { username?: string; email?: string; id?: string; fullName?: string };
   isAdmin?: boolean;
 }
 
@@ -44,7 +44,7 @@ export default function ProfilAkun({ fishDatabase, onBack, onBackHome, onNavigat
         // Get fish user ID (prefer userId, fallback to uploadedBy)
         const fishUserId = fish.userId !== undefined ? fish.userId : (fish.uploadedBy ? parseInt(fish.uploadedBy) : null);
         // Get current user ID
-        const currentUserId = user?.id ? (typeof user.id === 'string' ? user.id : user.id.toString()) : null;
+        const currentUserId = user?.id ? String(user.id) : null;
         
         // Compare (both as strings for consistency)
         const match = fishUserId !== null && currentUserId !== null && (
@@ -168,7 +168,7 @@ export default function ProfilAkun({ fishDatabase, onBack, onBackHome, onNavigat
               </div>
               <div>
                 <h2 className="font-['Montserrat',sans-serif] font-bold text-white text-2xl md:text-3xl drop-shadow-lg">
-                  {user?.fullName}
+                  {user?.fullName || user?.username || 'User'}
                 </h2>
                 <p className="text-cyan-100 drop-shadow-md">Kontributor Aktif</p>
               </div>

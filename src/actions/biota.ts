@@ -173,7 +173,6 @@ export async function createBiota(formData: FormData) {
       if (uploadError) {
         console.error('❌ Storage upload error:', {
           message: uploadError.message,
-          statusCode: uploadError.statusCode,
           error: uploadError
         })
         

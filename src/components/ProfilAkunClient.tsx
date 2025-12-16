@@ -68,6 +68,7 @@ export default function ProfilAkunClient({ fishDatabase, user, isAdmin }: Profil
     username: user?.user_metadata?.username || user?.email?.split('@')[0] || 'User',
     email: user?.email,
     id: user?.id,
+    fullName: user?.user_metadata?.full_name || user?.user_metadata?.username || user?.email?.split('@')[0] || 'User',
   }
 
   return (

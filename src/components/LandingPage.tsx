@@ -99,8 +99,8 @@ export default function LandingPage({ onLogin, onRegister }: LandingPageProps) {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="mx-auto max-w-2xl px-4 font-['Montserrat',sans-serif] text-base text-white/90 drop-shadow-md sm:text-lg md:text-xl lg:text-2xl"
           >
-            "Jelajahi dan Berkontribusi Terhadap Keanekaragaman Biota Air
-            Nusantara"
+            &quot;Jelajahi dan Berkontribusi Terhadap Keanekaragaman Biota Air
+            Nusantara&quot;
           </motion.p>
         </motion.div>
 

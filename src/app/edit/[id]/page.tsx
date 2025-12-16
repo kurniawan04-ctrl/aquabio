@@ -6,8 +6,9 @@ import EditFotoBiotaClient from '@/components/EditFotoBiotaClient'
 export default async function EditPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -18,7 +19,7 @@ export default async function EditPage({
   // Fetch biota data
   let biota = null
   try {
-    biota = await getBiotaById(params.id)
+    biota = await getBiotaById(id)
   } catch (error) {
     console.error('Error fetching biota:', error)
     redirect('/beranda')

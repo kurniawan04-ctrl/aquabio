@@ -123,7 +123,7 @@ export default function HasilPencarian({
                   Hasil pencarian untuk:
                 </p>
                 <p className="font-['Montserrat',sans-serif] font-bold text-white text-xl">
-                  "{query}"
+                  &quot;{query}&quot;
                 </p>
               </div>
             </div>

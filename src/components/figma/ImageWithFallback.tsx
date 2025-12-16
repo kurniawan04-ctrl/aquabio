@@ -34,14 +34,17 @@ export function ImageWithFallback({
     }
   }
 
-  // If it's a URL (http/https), use regular img tag
+  // If it's a URL (http/https), use Next.js Image with unoptimized for external URLs
   if (imgSrc.startsWith('http') || imgSrc.startsWith('//')) {
     return (
-      <img 
+      <Image 
         src={imgSrc} 
         alt={alt} 
+        width={width || 400}
+        height={height || 300}
         className={className} 
         onError={handleError}
+        unoptimized
         {...rest}
       />
     )
