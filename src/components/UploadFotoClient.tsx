@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { createBiota } from '@/actions/biota'
 import UploadFoto from './UploadFoto'
 
@@ -57,12 +58,25 @@ export default function UploadFotoClient({ user }: UploadFotoClientProps) {
       const result = await createBiota(formData)
       console.log('✅ Upload successful:', result)
       
-      router.push('/beranda')
-      router.refresh()
+      // ✅ NOTIFIKASI SUKSES: Muncul setelah berhasil upload biota
+      toast.success('Biota berhasil di upload.', {
+        description: 'Foto biota telah disimpan ke database.',
+        duration: 3000,
+      })
+      
+      // Delay sedikit sebelum redirect agar user bisa melihat notifikasi
+      setTimeout(() => {
+        router.push('/beranda')
+        router.refresh()
+      }, 500)
     } catch (error: any) {
       console.error('❌ Error uploading biota:', error)
       const errorMessage = error?.message || 'Gagal mengupload foto. Silakan coba lagi.'
-      alert(errorMessage)
+      // ❌ NOTIFIKASI ERROR: Muncul jika gagal upload biota
+      toast.error('Gagal mengupload biota', {
+        description: errorMessage,
+        duration: 4000,
+      })
     }
   }
 
