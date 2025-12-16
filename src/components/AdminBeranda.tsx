@@ -84,29 +84,31 @@ export default function AdminBeranda({
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900/50 via-blue-800/40 to-cyan-900/60" />
       </div>
 
-      {/* Floating particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1.5 h-1.5 bg-white/30 rounded-full"
-            initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-              y: typeof window !== 'undefined' ? window.innerHeight + 50 : 1000,
-            }}
-            animate={{
-              y: -50,
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-            }}
-            transition={{
-              duration: Math.random() * 8 + 12,
-              repeat: Infinity,
-              ease: "linear",
-              delay: Math.random() * 5,
-            }}
-          />
-        ))}
-      </div>
+      {/* Floating particles - Only render on client to avoid hydration mismatch */}
+      {isClient && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {particles.map((particle) => (
+            <motion.div
+              key={particle.id}
+              className="absolute w-1.5 h-1.5 bg-white/30 rounded-full"
+              initial={{
+                x: particle.initialX,
+                y: particle.initialY,
+              }}
+              animate={{
+                y: -50,
+                x: particle.animateX,
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                ease: "linear",
+                delay: particle.delay,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="relative z-10">

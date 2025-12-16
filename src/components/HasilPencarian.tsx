@@ -1,8 +1,11 @@
 'use client'
 
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Search, ArrowLeft, Home, MapPin, Tag } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import BiotaCard from "./BiotaCard";
+import BiotaDetailModal from "./BiotaDetailModal";
 const img4F43Fbdf03F44Bd3Ff8B4317Fae8E64D1 = "/ef02c2ea3f4acc92d18b009c0eaf594dd003a9a7.png";
 
 interface FishData {
@@ -12,6 +15,9 @@ interface FishData {
   location: string;
   category?: string;
   description?: string;
+  photographer?: string;
+  uploadDate?: string;
+  userId?: string;
 }
 
 interface HasilPencarianProps {
@@ -31,6 +37,44 @@ export default function HasilPencarian({
   onSelectFish,
   onNavigateToAbout
 }: HasilPencarianProps) {
+  const [selectedFish, setSelectedFish] = useState<FishData | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [particles, setParticles] = useState<Array<{
+    initialX: number;
+    initialY: number;
+    animateX: number;
+    duration: number;
+    delay: number;
+  }>>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  // Generate particle positions only on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    const particleCount = 20;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1440;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    
+    const newParticles = Array.from({ length: particleCount }, () => ({
+      initialX: Math.random() * width,
+      initialY: height + 50,
+      animateX: Math.random() * width,
+      duration: Math.random() * 8 + 12,
+      delay: Math.random() * 5,
+    }));
+    
+    setParticles(newParticles);
+  }, []);
+
+  const handleSelectFish = (fish: FishData) => {
+    setSelectedFish(fish);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedFish(null);
+  };
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-cyan-900">
       {/* Background Image with Overlay */}
@@ -43,29 +87,31 @@ export default function HasilPencarian({
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900/50 via-blue-800/40 to-cyan-900/60" />
       </div>
 
-      {/* Floating particles - SAMA DENGAN BERANDA */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute h-1.5 w-1.5 rounded-full bg-white/30"
-            initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-              y: typeof window !== 'undefined' ? window.innerHeight + 50 : 1000,
-            }}
-            animate={{
-              y: -50,
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-            }}
-            transition={{
-              duration: Math.random() * 8 + 12,
-              repeat: Infinity,
-              ease: "linear",
-              delay: Math.random() * 5,
-            }}
-          />
-        ))}
-      </div>
+      {/* Floating particles - Only render on client to avoid hydration mismatch */}
+      {isClient && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {particles.map((particle, i) => (
+            <motion.div
+              key={i}
+              className="absolute h-1.5 w-1.5 rounded-full bg-white/30"
+              initial={{
+                x: particle.initialX,
+                y: particle.initialY,
+              }}
+              animate={{
+                y: -50,
+                x: particle.animateX,
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                ease: "linear",
+                delay: particle.delay,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Content Container */}
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -149,71 +195,23 @@ export default function HasilPencarian({
           {/* Results Grid */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {fishDatabase.map((fish, index) => (
-              <motion.button
+              <BiotaCard
                 key={fish.id}
-                initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
-                transition={{ 
-                  delay: 0.3 + index * 0.1,
-                  type: "spring",
-                  stiffness: 100
-                }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                onClick={() => onSelectFish(fish)}
-                className="group overflow-hidden rounded-xl border-2 border-white/30 bg-white/20 shadow-xl backdrop-blur-sm transition-all hover:border-cyan-300 hover:shadow-2xl"
-              >
-                {/* Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <ImageWithFallback
-                    src={fish.image}
-                    alt={fish.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-cyan-500/0 transition-all duration-300 group-hover:bg-cyan-500/20">
-                    <div className="scale-0 rounded-full bg-white/90 p-3 transition-transform duration-300 group-hover:scale-100">
-                      <Search className="h-6 w-6 text-cyan-600" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Info */}
-                <div className="p-4 text-left">
-                  <h4 className="mb-2 font-['Montserrat',sans-serif] font-bold text-white line-clamp-1">
-                    {fish.name}
-                  </h4>
-                  
-                  <div className="mb-2 flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-cyan-300" />
-                    <p className="font-['Montserrat',sans-serif] text-cyan-200 text-sm line-clamp-1">
-                      {fish.location}
-                    </p>
-                  </div>
-
-                  {fish.category && (
-                    <div className="flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-cyan-300" />
-                      <div className="inline-block rounded-full bg-cyan-500/30 px-3 py-1">
-                        <p className="font-['Montserrat',sans-serif] text-white text-xs">
-                          {fish.category}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {fish.description && (
-                    <p className="mt-2 font-['Montserrat',sans-serif] text-cyan-100 text-xs line-clamp-2">
-                      {fish.description}
-                    </p>
-                  )}
-                </div>
-              </motion.button>
+                fish={fish}
+                onClick={() => handleSelectFish(fish)}
+                index={index}
+              />
             ))}
           </div>
         </motion.div>
       </div>
+
+      {/* Detail Modal */}
+      <BiotaDetailModal
+        fish={selectedFish}
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Logo from "./Logo";
@@ -48,35 +49,66 @@ const teamMembers = [
 ];
 
 export default function TentangKami({ onBack, onBackHome, onNavigate }: TentangKamiProps) {
+  const [bubbles, setBubbles] = useState<Array<{
+    width: number;
+    height: number;
+    left: number;
+    bottom: number;
+    animateX: number;
+    duration: number;
+    delay: number;
+  }>>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  // Generate bubble positions only on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    const bubbleCount = 25;
+    
+    const newBubbles = Array.from({ length: bubbleCount }, () => ({
+      width: Math.random() * 20 + 10,
+      height: Math.random() * 20 + 10,
+      left: Math.random() * 100,
+      bottom: Math.random() * 20,
+      animateX: Math.random() * 100 - 50,
+      duration: 8 + Math.random() * 4,
+      delay: Math.random() * 5,
+    }));
+    
+    setBubbles(newBubbles);
+  }, []);
+
   return (
     <div className="relative min-h-screen w-full overflow-auto bg-gradient-to-br from-cyan-900 via-blue-900 to-blue-950">
-      {/* Underwater Background with Bubbles */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Animated Bubbles */}
-        {[...Array(25)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full bg-cyan-400/30"
-            style={{
-              width: `${Math.random() * 20 + 10}px`,
-              height: `${Math.random() * 20 + 10}px`,
-              left: `${Math.random() * 100}%`,
-              bottom: `-${Math.random() * 20}%`,
-            }}
-            animate={{
-              y: [0, -1200],
-              x: [0, Math.random() * 100 - 50],
-              opacity: [0, 0.7, 0],
-            }}
-            transition={{
-              duration: 8 + Math.random() * 4,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-              ease: "linear",
-            }}
-          />
-        ))}
-      </div>
+      {/* Underwater Background with Bubbles - Only render on client to avoid hydration mismatch */}
+      {isClient && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {/* Animated Bubbles */}
+          {bubbles.map((bubble, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full bg-cyan-400/30"
+              style={{
+                width: `${bubble.width}px`,
+                height: `${bubble.height}px`,
+                left: `${bubble.left}%`,
+                bottom: `-${bubble.bottom}%`,
+              }}
+              animate={{
+                y: [0, -1200],
+                x: [0, bubble.animateX],
+                opacity: [0, 0.7, 0],
+              }}
+              transition={{
+                duration: bubble.duration,
+                repeat: Infinity,
+                delay: bubble.delay,
+                ease: "linear",
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Content Container */}
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -199,42 +231,48 @@ export default function TentangKami({ onBack, onBackHome, onNavigate }: TentangK
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 + index * 0.1 }}
               whileHover={{ scale: 1.05, y: -10 }}
-              className="group relative overflow-hidden rounded-2xl border-2 border-white/30 bg-white/10 p-6 shadow-2xl backdrop-blur-xl transition-all"
+              className="group relative overflow-hidden rounded-2xl border-2 border-white/30 bg-white/10 p-6 shadow-2xl backdrop-blur-xl transition-all flex flex-col items-center"
             >
               {/* Gradient Overlay on Hover */}
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/0 to-blue-600/0 opacity-0 transition-opacity group-hover:opacity-20" />
               
               {/* Avatar Circle - Foto jika tersedia, kalau tidak pakai inisial */}
-              <div className="relative mb-4 flex justify-center">
+              <div className="relative mb-4 flex justify-center w-full">
                 {member.photoUrl ? (
-                  <div className="relative h-24 w-24">
+                  <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full ring-4 ring-white/30 transition-all group-hover:ring-white/50 shadow-lg">
                     <Image
                       src={member.photoUrl}
                       alt={member.name}
                       width={96}
                       height={96}
-                      className="rounded-full object-cover shadow-lg ring-4 ring-white/30 transition-all group-hover:ring-white/50"
+                      className="object-cover object-center"
+                      style={{ 
+                        width: '100%', 
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center'
+                      }}
                       unoptimized
                     />
                   </div>
                 ) : (
-                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg ring-4 ring-white/30 transition-all group-hover:ring-white/50">
-                  <span className="font-['Montserrat',sans-serif] font-bold text-white text-3xl">
-                    {member.name.charAt(0)}
-                  </span>
-                </div>
+                  <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg ring-4 ring-white/30 transition-all group-hover:ring-white/50">
+                    <span className="font-['Montserrat',sans-serif] font-bold text-white text-3xl">
+                      {member.name.charAt(0)}
+                    </span>
+                  </div>
                 )}
               </div>
 
               {/* Member Info */}
-              <div className="text-center">
-                <h3 className="font-['Montserrat',sans-serif] font-bold text-white mb-2 text-xl">
+              <div className="text-center space-y-2">
+                <h3 className="font-['Montserrat',sans-serif] font-bold text-white text-xl leading-tight">
                   {member.name}
                 </h3>
-                <p className="font-['Montserrat',sans-serif] text-cyan-200 mb-2">
+                <p className="font-['Montserrat',sans-serif] text-cyan-200 text-sm">
                   NIM: {member.nim}
                 </p>
-                <div className="inline-block rounded-full bg-white/20 px-4 py-1 backdrop-blur-sm">
+                <div className="inline-block rounded-full bg-white/20 px-4 py-1.5 backdrop-blur-sm">
                   <p className="font-['Montserrat',sans-serif] text-white text-sm">
                     {member.role}
                   </p>

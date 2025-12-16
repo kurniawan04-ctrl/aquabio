@@ -137,7 +137,7 @@ export async function signIn(formData: FormData | null) {
     }
 
     // Cari email dari username di profiles table (case insensitive)
-    // Coba exact match dulu
+    // Coba exact match dulu, lalu case insensitive jika perlu
     let profile = null
     let profileError = null
     
@@ -151,7 +151,6 @@ export async function signIn(formData: FormData | null) {
       profile = profileExact
     } else {
       // Jika exact match gagal, coba case insensitive
-      console.log('Exact match failed, trying case insensitive...')
       const { data: profileCaseInsensitive, error: errorCaseInsensitive } = await supabase
         .from('profiles')
         .select('email, username')
@@ -160,33 +159,14 @@ export async function signIn(formData: FormData | null) {
       
       if (profileCaseInsensitive && !errorCaseInsensitive) {
         profile = profileCaseInsensitive
-        console.log('Found profile with case insensitive search:', profile)
       } else {
         profileError = errorCaseInsensitive || errorExact
-        console.error('Profile not found:', profileError)
       }
     }
 
     if (profileError || !profile) {
-      // Debug: cek semua profiles untuk troubleshooting
-      const { data: allProfiles, error: allProfilesError } = await supabase
-        .from('profiles')
-        .select('username, email')
-        .limit(10)
-      
-      console.error('=== LOGIN DEBUG ===')
-      console.error('Username searched:', username)
-      console.error('Profile error:', profileError)
-      console.error('All profiles error:', allProfilesError)
-      console.error('Available profiles:', allProfiles)
-      console.error('==================')
-      
-      // Return error dengan info lebih detail
-      const errorMsg = allProfiles && allProfiles.length > 0
-        ? `Username "${username}" tidak ditemukan. Username yang tersedia: ${allProfiles.map(p => p.username).join(', ')}`
-        : `Username "${username}" tidak ditemukan. Pastikan Anda sudah mendaftar dan profile sudah dibuat.`
-      
-      return { error: errorMsg }
+      // Return generic error message untuk keamanan (tidak mengkonfirmasi apakah username ada atau tidak)
+      return { error: 'Username atau password salah' }
     }
 
     // Login dengan email yang ditemukan
@@ -196,25 +176,24 @@ export async function signIn(formData: FormData | null) {
     })
 
     if (error) {
-      console.error('Login error:', error)
-      if (error.message.includes('Invalid login credentials')) {
-        return { error: 'Username atau password salah' }
-      }
+      // Return generic error message untuk semua kasus (keamanan)
+      // Tidak membedakan antara username salah atau password salah
       if (error.message.includes('Email not confirmed')) {
         return { error: 'Email belum dikonfirmasi. Silakan cek email Anda.' }
       }
-      return { error: error.message || 'Password salah' }
+      // Untuk semua error lainnya (Invalid login credentials, dll), return pesan generik
+      return { error: 'Username atau password salah' }
     }
 
     revalidatePath('/', 'layout')
     return { success: true }
   } catch (error: any) {
-    console.error('SignIn catch error:', error)
     // Handle NEXT_REDIRECT error
     if (error.message === 'NEXT_REDIRECT') {
       throw error
     }
-    return { error: error.message || 'Terjadi kesalahan saat login' }
+    // Return generic error message untuk keamanan
+    return { error: 'Username atau password salah' }
   }
 }
 

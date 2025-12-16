@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { updateBiota } from '@/actions/biota'
 import EditFotoBiota from './EditFotoBiota'
 
@@ -55,11 +56,20 @@ export default function EditFotoBiotaClient({ fish }: EditFotoBiotaClientProps) 
       }
 
       await updateBiota(fish.id.toString(), formData)
+      // Notifikasi sukses setelah berhasil mengedit
+      toast.success('Biota berhasil diperbarui.', {
+        description: 'Perubahan data biota telah disimpan.',
+        duration: 3000,
+      })
       router.push(`/biota/${fish.id}`)
       router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating biota:', error)
-      alert('Gagal menyimpan perubahan. Silakan coba lagi.')
+      // Notifikasi error jika gagal mengedit
+      toast.error('Gagal memperbarui biota', {
+        description: error.message || 'Terjadi kesalahan saat menyimpan perubahan. Silakan coba lagi.',
+        duration: 4000,
+      })
     }
   }
 

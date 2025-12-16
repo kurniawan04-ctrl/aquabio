@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { signOut } from '@/actions/auth'
 import { deleteBiota } from '@/actions/biota'
 import AdminBeranda from './AdminBeranda'
@@ -60,11 +61,20 @@ export default function AdminBerandaClient({ fishDatabase, user }: AdminBerandaC
     setIsDeleting(fishId)
     try {
       await deleteBiota(fishId.toString())
+      // Notifikasi sukses setelah berhasil menghapus
+      toast.success('Biota berhasil dihapus.', {
+        description: 'Foto biota telah dihapus dari database.',
+        duration: 3000,
+      })
       // Refresh the page to show updated data
       router.refresh()
     } catch (error: any) {
       console.error('Error deleting biota:', error)
-      alert(error.message || 'Gagal menghapus foto biota')
+      // Notifikasi error jika gagal menghapus
+      toast.error('Gagal menghapus biota', {
+        description: error.message || 'Terjadi kesalahan saat menghapus foto biota. Silakan coba lagi.',
+        duration: 4000,
+      })
     } finally {
       setIsDeleting(null)
     }

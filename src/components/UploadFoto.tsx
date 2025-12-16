@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
 import Logo from "./Logo";
@@ -38,6 +38,32 @@ export default function UploadFoto({ onBack, onBackHome, onUpload, onNavigateToA
     deskripsi: "",
     lokasi: ""
   });
+  const [particles, setParticles] = useState<Array<{
+    initialX: number;
+    initialY: number;
+    animateX: number;
+    duration: number;
+    delay: number;
+  }>>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  // Generate particle positions only on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    const particleCount = 25;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1440;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    
+    const newParticles = Array.from({ length: particleCount }, () => ({
+      initialX: Math.random() * width,
+      initialY: height + 50,
+      animateX: Math.random() * width,
+      duration: Math.random() * 8 + 12,
+      delay: Math.random() * 5,
+    }));
+    
+    setParticles(newParticles);
+  }, []);
 
   const categories = [
     { id: "Ikan", label: "Ikan", icon: Fish, color: "from-blue-500 to-cyan-500" },
@@ -115,29 +141,31 @@ export default function UploadFoto({ onBack, onBackHome, onUpload, onNavigateToA
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900/60 via-blue-800/50 to-cyan-900/70" />
       </div>
 
-      {/* Floating particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(25)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-white/40 rounded-full"
-            initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-              y: typeof window !== 'undefined' ? window.innerHeight + 50 : 1000,
-            }}
-            animate={{
-              y: -50,
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-            }}
-            transition={{
-              duration: Math.random() * 8 + 12,
-              repeat: Infinity,
-              ease: "linear",
-              delay: Math.random() * 5,
-            }}
-          />
-        ))}
-      </div>
+      {/* Floating particles - Only render on client to avoid hydration mismatch */}
+      {isClient && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {particles.map((particle, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-white/40 rounded-full"
+              initial={{
+                x: particle.initialX,
+                y: particle.initialY,
+              }}
+              animate={{
+                y: -50,
+                x: particle.animateX,
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                ease: "linear",
+                delay: particle.delay,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="relative z-10">

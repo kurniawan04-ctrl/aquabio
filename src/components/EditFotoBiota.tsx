@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Home, Save, X, Edit3, Image as ImageIcon, Fish, Leaf, Bug, Shell } from "lucide-react";
 import { Button } from "./ui/button";
@@ -36,6 +36,32 @@ export default function EditFotoBiota({ fish, onBack, onBackHome, onSave, onNavi
     location: fish.location,
     category: fish.category || "Ikan"
   });
+  const [particles, setParticles] = useState<Array<{
+    initialX: number;
+    initialY: number;
+    animateX: number;
+    duration: number;
+    delay: number;
+  }>>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  // Generate particle positions only on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    const particleCount = 20;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1440;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    
+    const newParticles = Array.from({ length: particleCount }, () => ({
+      initialX: Math.random() * width,
+      initialY: height + 50,
+      animateX: Math.random() * width,
+      duration: Math.random() * 8 + 12,
+      delay: Math.random() * 5,
+    }));
+    
+    setParticles(newParticles);
+  }, []);
 
   const categories = [
     { id: "Ikan", label: "Ikan", icon: Fish, color: "from-blue-500 to-cyan-500" },
@@ -75,29 +101,31 @@ export default function EditFotoBiota({ fish, onBack, onBackHome, onSave, onNavi
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900/50 via-blue-800/40 to-cyan-900/60" />
       </div>
 
-      {/* Floating particles - SAMA DENGAN BERANDA */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute h-1.5 w-1.5 rounded-full bg-white/30"
-            initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-              y: typeof window !== 'undefined' ? window.innerHeight + 50 : 1000,
-            }}
-            animate={{
-              y: -50,
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-            }}
-            transition={{
-              duration: Math.random() * 8 + 12,
-              repeat: Infinity,
-              ease: "linear",
-              delay: Math.random() * 5,
-            }}
-          />
-        ))}
-      </div>
+      {/* Floating particles - Only render on client to avoid hydration mismatch */}
+      {isClient && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {particles.map((particle, i) => (
+            <motion.div
+              key={i}
+              className="absolute h-1.5 w-1.5 rounded-full bg-white/30"
+              initial={{
+                x: particle.initialX,
+                y: particle.initialY,
+              }}
+              animate={{
+                y: -50,
+                x: particle.animateX,
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                ease: "linear",
+                delay: particle.delay,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Content Container */}
       <div className="relative z-10 mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">

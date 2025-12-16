@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import Logo from "./Logo";
 import { Button } from "./ui/button";
@@ -11,6 +11,8 @@ import {
   Search
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import BiotaCard from "./BiotaCard";
+import BiotaDetailModal from "./BiotaDetailModal";
 const imgUnderwaterCave = "/ef02c2ea3f4acc92d18b009c0eaf594dd003a9a7.png";
 const imgRectangle15 = "/48888d8f2adb1ccb13c4e60a34a5e0a8e99bb9b8.png";
 const imgRectangle16 = "/e7514e0a1edf118e9ce83188f04cf9d3e6a02b9f.png";
@@ -32,6 +34,34 @@ interface GalleryProps {
 
 export default function Gallery({ fishDatabase, onBack, onBackHome, onNavigate, onSelectFish, onSearch, onNavigateToAbout, user }: GalleryProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFish, setSelectedFish] = useState<any | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [particles, setParticles] = useState<Array<{
+    initialX: number;
+    initialY: number;
+    animateX: number;
+    duration: number;
+    delay: number;
+  }>>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  // Generate particle positions only on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    const particleCount = 25;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 1440;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    
+    const newParticles = Array.from({ length: particleCount }, () => ({
+      initialX: Math.random() * width,
+      initialY: height + 50,
+      animateX: Math.random() * width,
+      duration: Math.random() * 8 + 12,
+      delay: Math.random() * 5,
+    }));
+    
+    setParticles(newParticles);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +71,13 @@ export default function Gallery({ fishDatabase, onBack, onBackHome, onNavigate, 
   };
 
   const handlePhotoClick = (photo: any) => {
-    onSelectFish(photo);
+    setSelectedFish(photo);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedFish(null);
   };
 
   return (
@@ -56,29 +92,31 @@ export default function Gallery({ fishDatabase, onBack, onBackHome, onNavigate, 
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900/50 via-blue-800/40 to-cyan-900/60" />
       </div>
 
-      {/* Floating particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(25)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-white/40 rounded-full"
-            initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-              y: typeof window !== 'undefined' ? window.innerHeight + 50 : 1000,
-            }}
-            animate={{
-              y: -50,
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1440),
-            }}
-            transition={{
-              duration: Math.random() * 8 + 12,
-              repeat: Infinity,
-              ease: "linear",
-              delay: Math.random() * 5,
-            }}
-          />
-        ))}
-      </div>
+      {/* Floating particles - Only render on client to avoid hydration mismatch */}
+      {isClient && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {particles.map((particle, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-white/40 rounded-full"
+              initial={{
+                x: particle.initialX,
+                y: particle.initialY,
+              }}
+              animate={{
+                y: -50,
+                x: particle.animateX,
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                ease: "linear",
+                delay: particle.delay,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="relative z-10">
@@ -177,45 +215,24 @@ export default function Gallery({ fishDatabase, onBack, onBackHome, onNavigate, 
           {/* Photos Grid */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {fishDatabase.map((photo, index) => (
-              <motion.div
+              <BiotaCard
                 key={photo.id}
-                initial={{ opacity: 0, scale: 0.8, y: 50 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 + index * 0.05 }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="group cursor-pointer overflow-hidden rounded-2xl border-2 border-white/40 bg-white/10 shadow-2xl backdrop-blur-xl transition-all hover:shadow-cyan-400/50 hover:border-cyan-400/60"
+                fish={photo}
                 onClick={() => handlePhotoClick(photo)}
-              >
-                {/* Image */}
-                <div className="relative aspect-video overflow-hidden">
-                  <ImageWithFallback
-                    src={photo.image}
-                    alt={photo.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                  
-                  {/* Hover Info */}
-                  <div className="absolute bottom-4 left-4 right-4 translate-y-10 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
-                    <div className="flex items-center gap-2 text-white">
-                      <span className="text-sm">{photo.location}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-['Montserrat',sans-serif] font-bold text-white drop-shadow-lg mb-1">
-                    {photo.name}
-                  </h3>
-                  <p className="text-sm text-cyan-100 drop-shadow-md">{photo.location}</p>
-                </div>
-              </motion.div>
+                index={index}
+              />
             ))}
           </div>
 
         </div>
       </div>
+
+      {/* Detail Modal */}
+      <BiotaDetailModal
+        fish={selectedFish}
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }
