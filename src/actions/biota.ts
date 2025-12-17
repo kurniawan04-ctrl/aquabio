@@ -127,10 +127,13 @@ export async function getBiotaById(id: string) {
 }
 
 export async function createBiota(formData: FormData) {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
+  try {
+    const supabase = await createClient()
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      throw new Error('Unauthorized: Silakan login terlebih dahulu')
+    }
 
   const imageFile = formData.get('image') as File | null
   
