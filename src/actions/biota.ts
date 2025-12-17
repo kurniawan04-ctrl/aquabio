@@ -258,13 +258,21 @@ export async function createBiota(formData: FormData) {
     .select()
     .single()
 
-  if (error) {
-    throw new Error(error.message)
-  }
+    if (error) {
+      console.error('❌ Database insert error:', error)
+      throw new Error(`Gagal menyimpan data biota: ${error.message}`)
+    }
 
-  revalidatePath('/beranda')
-  revalidatePath('/gallery')
-  return data
+    revalidatePath('/beranda')
+    revalidatePath('/gallery')
+    return data
+  } catch (error: any) {
+    console.error('❌ createBiota error:', error)
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error(error?.message || 'Terjadi kesalahan saat mengupload biota. Silakan coba lagi.')
+  }
 }
 
 export async function updateBiota(id: string, formData: FormData) {
