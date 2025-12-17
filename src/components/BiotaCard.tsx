@@ -67,3 +67,4 @@ export default function BiotaCard({ fish, onClick, index = 0 }: BiotaCardProps) 
   )
 }
 
+

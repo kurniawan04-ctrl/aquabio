@@ -225,3 +225,4 @@ Setelah environment variables diset dan di-redeploy:
 
 **Selamat! Project Anda seharusnya sudah berjalan dengan baik di Vercel! 🎉**
 
+
