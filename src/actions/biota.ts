@@ -165,8 +165,24 @@ export async function createBiota(formData: FormData) {
     const isValidType = imageFile.type && allowedTypes.includes(imageFile.type)
     const isValidExtension = allowedExtensions.includes(fileExt)
     
+    // Enhanced validation for mobile devices
+    // Mobile browsers sometimes don't provide MIME type correctly
     if (!isValidType && !isValidExtension) {
-      throw new Error(`Tipe file tidak didukung. Gunakan: JPG, JPEG, PNG, WebP, HEIC, atau TIFF. File Anda: ${imageFile.type || 'unknown'} (${fileExt})`)
+      // Log detailed info for debugging
+      console.error('❌ File validation failed:', {
+        fileName: imageFile.name,
+        fileType: imageFile.type || 'empty',
+        fileExtension: fileExt || 'none',
+        fileSize: imageFile.size,
+        allowedTypes,
+        allowedExtensions
+      })
+      
+      throw new Error(
+        `Tipe file tidak didukung. Gunakan: JPG, JPEG, PNG, WebP, HEIC, atau TIFF. ` +
+        `File Anda: ${imageFile.type || 'unknown'} (${fileExt || 'no extension'}). ` +
+        `Jika foto dari kamera, coba convert ke JPG terlebih dahulu.`
+      )
     }
 
     // Validate file size (max 10MB)

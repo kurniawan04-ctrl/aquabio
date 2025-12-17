@@ -71,11 +71,32 @@ export default function UploadFotoClient({ user }: UploadFotoClientProps) {
       }, 500)
     } catch (error: any) {
       console.error('❌ Error uploading biota:', error)
+      
+      // Log detailed error info for debugging
+      console.error('Error details:', {
+        message: error?.message,
+        fileName: fish.imageFile?.name,
+        fileType: fish.imageFile?.type,
+        fileSize: fish.imageFile?.size,
+        fileExtension: fish.imageFile?.name?.split('.').pop(),
+      })
+      
       const errorMessage = error?.message || 'Gagal mengupload foto. Silakan coba lagi.'
+      
+      // More specific error messages for better UX
+      let userFriendlyMessage = errorMessage
+      if (errorMessage.includes('Tipe file tidak didukung')) {
+        userFriendlyMessage = 'Format foto tidak didukung. Gunakan JPG, PNG, WebP, HEIC, atau TIFF. Jika dari kamera iPhone, coba convert ke JPG terlebih dahulu.'
+      } else if (errorMessage.includes('Ukuran file terlalu besar')) {
+        userFriendlyMessage = 'Ukuran foto terlalu besar (maksimal 10MB). Coba kompres foto atau gunakan foto dengan resolusi lebih rendah.'
+      } else if (errorMessage.includes('Bucket') || errorMessage.includes('Permission')) {
+        userFriendlyMessage = 'Terjadi kesalahan pada server. Silakan coba lagi dalam beberapa saat.'
+      }
+      
       // ❌ NOTIFIKASI ERROR: Muncul jika gagal upload biota
       toast.error('Gagal mengupload biota', {
-        description: errorMessage,
-        duration: 4000,
+        description: userFriendlyMessage,
+        duration: 5000, // Lebih lama agar user bisa baca
       })
     }
   }

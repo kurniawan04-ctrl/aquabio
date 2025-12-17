@@ -75,6 +75,25 @@ export default function UploadFoto({ onBack, onBackHome, onUpload, onNavigateToA
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Client-side validation for better UX
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || ''
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'heif', 'tiff', 'tif']
+      const maxSize = 10 * 1024 * 1024 // 10MB
+      
+      // Check file size
+      if (file.size > maxSize) {
+        alert(`Ukuran file terlalu besar (${(file.size / 1024 / 1024).toFixed(2)}MB). Maksimal 10MB.`)
+        e.target.value = '' // Reset input
+        return
+      }
+      
+      // Check file extension (for mobile devices that might not have MIME type)
+      if (!allowedExtensions.includes(fileExt) && !file.type.startsWith('image/')) {
+        alert(`Format file tidak didukung: ${fileExt || 'tidak ada extension'}. Gunakan: JPG, PNG, WebP, HEIC, atau TIFF.`)
+        e.target.value = '' // Reset input
+        return
+      }
+      
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
