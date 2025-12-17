@@ -145,10 +145,28 @@ export async function createBiota(formData: FormData) {
       userId: user.id
     })
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
-    if (!imageFile.type || !allowedTypes.includes(imageFile.type)) {
-      throw new Error(`Tipe file tidak didukung. Gunakan: JPG, PNG, WEBP, atau GIF. File Anda: ${imageFile.type || 'unknown'}`)
+    // Validate file type - Support: JPG, JPEG, PNG, WebP, HEIC, TIFF
+    const allowedTypes = [
+      'image/jpeg', 
+      'image/jpg', 
+      'image/png', 
+      'image/webp', 
+      'image/gif',
+      'image/heic',
+      'image/heif',
+      'image/tiff',
+      'image/tif'
+    ]
+    
+    // Also check file extension for HEIC/TIFF (browser might not detect MIME type correctly)
+    const fileExt = imageFile.name.split('.').pop()?.toLowerCase() || ''
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'heif', 'tiff', 'tif']
+    
+    const isValidType = imageFile.type && allowedTypes.includes(imageFile.type)
+    const isValidExtension = allowedExtensions.includes(fileExt)
+    
+    if (!isValidType && !isValidExtension) {
+      throw new Error(`Tipe file tidak didukung. Gunakan: JPG, JPEG, PNG, WebP, HEIC, atau TIFF. File Anda: ${imageFile.type || 'unknown'} (${fileExt})`)
     }
 
     // Validate file size (max 10MB)
@@ -157,8 +175,9 @@ export async function createBiota(formData: FormData) {
       throw new Error(`Ukuran file terlalu besar. Maksimal 10MB. File Anda: ${(imageFile.size / 1024 / 1024).toFixed(2)}MB`)
     }
 
-    const fileExt = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const fileName = `${user.id}/${Date.now()}.${fileExt}`
+    // Use fileExt from validation above, or default to 'jpg' if not set
+    const finalFileExt = fileExt || 'jpg'
+    const fileName = `${user.id}/${Date.now()}.${finalFileExt}`
     
     console.log('📁 Uploading to:', `biota_images/${fileName}`)
     

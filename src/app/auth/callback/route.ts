@@ -28,7 +28,46 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error && data.session) {
-      // Email confirmed successfully
+      // Check if email is from Google (for registration requirement)
+      const userEmail = data.session.user.email
+      if (userEmail) {
+        const isGoogleEmail = userEmail.endsWith('@gmail.com') || 
+                            userEmail.endsWith('@googlemail.com') ||
+                            userEmail.includes('@') && userEmail.split('@')[1]?.includes('google')
+        
+        if (!isGoogleEmail) {
+          // If not Google email, sign out and show error
+          await supabase.auth.signOut()
+          return redirect(`/register?error=${encodeURIComponent('Registrasi hanya dapat dilakukan dengan akun Google (Gmail). Silakan gunakan email Gmail Anda.')}`)
+        }
+      }
+      
+      // Create or update profile for Google OAuth user
+      if (data.session.user) {
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', data.session.user.id)
+          .single()
+        
+        if (!existingProfile) {
+          // Create profile for new Google OAuth user
+          const username = data.session.user.email?.split('@')[0] || 'user'
+          const fullName = data.session.user.user_metadata?.full_name || 
+                          data.session.user.user_metadata?.name || 
+                          username
+          
+          await supabase
+            .from('profiles')
+            .insert({
+              id: data.session.user.id,
+              username: username,
+              email: data.session.user.email || '',
+              full_name: fullName,
+            })
+        }
+      }
+      
       console.log('✅ Email confirmed successfully')
       return redirect(next)
     }

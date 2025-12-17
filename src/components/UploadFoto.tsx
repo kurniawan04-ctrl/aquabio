@@ -272,7 +272,7 @@ export default function UploadFoto({ onBack, onBackHome, onUpload, onNavigateToA
                     <label>
                       <input
                         type="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/heic,image/heif,image/tiff,image/tif,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif,.tiff,.tif"
                         onChange={handleFileChange}
                         className="hidden"
                       />
