@@ -10,8 +10,11 @@ const nextConfig: NextConfig = {
     ],
   },
   // Increase body size limit for Server Actions to support file uploads up to 10MB
-  serverActions: {
-    bodySizeLimit: '15mb', // Set to 15MB to allow 10MB files with some margin
+  // For Next.js 15, use experimental.serverActions
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '15mb', // Set to 15MB to allow 10MB files with some margin
+    },
   },
 }
 
